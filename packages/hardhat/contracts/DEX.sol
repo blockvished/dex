@@ -118,7 +118,6 @@ contract DEX {
         emit TokenToEthSwap(msg.sender, tokenInput, ethOutput);
         return ethOutput;
     }
-        event TokenToEthSwap(msg.sender, tokenInput, ethOutput);
 
     /**
      * @notice allows deposits of $BAL and $ETH to liquidity pool
