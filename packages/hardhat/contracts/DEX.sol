@@ -92,12 +92,24 @@ contract DEX {
     /**
      * @notice sends Ether to DEX in exchange for $BAL
      */
-    function ethToToken() public payable returns (uint256 tokenOutput) {}
+    function ethToToken() public payable returns (uint256 tokenOutput) {
+        uint256 token_reserve = token.balanceOf(address(this));
+        uint256 tokens_bought = price(msg.value, address(this).balance - msg.value, token_reserve);
+        require(token.transfer(msg.sender, tokens_bought));
+        return tokens_bought;
+    }
 
     /**
      * @notice sends $BAL tokens to DEX in exchange for Ether
      */
-    function tokenToEth(uint256 tokenInput) public returns (uint256 ethOutput) {}
+    function tokenToEth(uint256 tokenInput) public returns (uint256 ethOutput) {
+        uint256 token_reserve = token.balanceOf(address(this));
+        uint256 eth_bought = price(tokenInput, token_reserve, address(this).balance);
+        (bool sent, ) = msg.sender.call{value: eth_bought}("");
+        require(sent, "Failed to send user eth.");
+        require(token.transferFrom(msg.sender, address(this), tokenInput));
+        return eth_bought;
+    }
 
     /**
      * @notice allows deposits of $BAL and $ETH to liquidity pool
